@@ -549,10 +549,9 @@ mod tests {
         }
     }
 
-    quickcheck! {
-      fn test_vint(i: u64) -> bool {
+    #[quickcheck]
+    fn test_vint(i: u64) -> bool {
         test_vint_serializer(i)
-      }
     }
 
     #[test]
@@ -615,10 +614,9 @@ mod tests {
         }
     }
 
-    quickcheck! {
-      fn test_ebml_u64(i: u64) -> bool {
+    #[quickcheck]
+    fn test_ebml_u64(i: u64) -> bool {
         test_ebml_u64_serializer(i)
-      }
     }
 
     #[test]
@@ -630,66 +628,71 @@ mod tests {
         test_ebml_u64_serializer(2100000);
     }
 
-    quickcheck! {
-      fn test_ebml_u8(num: u8) -> bool {
+    #[quickcheck]
+    fn test_ebml_u8(num: u8) -> bool {
         let id = 0x9F;
         info!("testing for id={}, num={}", id, num);
 
         let mut data = [0u8; 100];
         {
-          let gen_res = gen_u8((&mut data[..], 0), id, num);
-          info!("gen_res: {:?}", gen_res);
+            let gen_res = gen_u8((&mut data[..], 0), id, num);
+            info!("gen_res: {:?}", gen_res);
         }
         info!("{}", (&data[..]).to_hex(16));
 
         let parse_res: IResult<&[u8], u64, Error> = ebml_uint!(&data[..], id);
         info!("parse_res: {:?}", parse_res);
         match parse_res {
-          Ok((_rest, o)) => {
-            assert_eq!(num as u64, o);
-            return true;
-          },
-          e => panic!(format!("parse error: {:?}", e)),
+            Ok((_rest, o)) => {
+                assert_eq!(num as u64, o);
+                return true;
+            }
+            e => panic!(format!("parse error: {:?}", e)),
         }
-      }
     }
 
-    quickcheck! {
-      fn test_ebml_header(version: u8, read_version: u8, max_id_length: u8, max_size_length: u8, doc_type: String,
-        doc_type_version: u8, doc_type_read_version: u8) -> bool {
+    #[quickcheck]
+    fn test_ebml_header(
+        version: u8,
+        read_version: u8,
+        max_id_length: u8,
+        max_size_length: u8,
+        doc_type: String,
+        doc_type_version: u8,
+        doc_type_read_version: u8,
+    ) -> bool {
         let header = EBMLHeader {
-          version: version as u64,
-          read_version: read_version as u64,
-          max_id_length: max_id_length as u64,
-          max_size_length: max_size_length as u64,
-          doc_type: doc_type,
-          doc_type_version: doc_type_version as u64,
-          doc_type_read_version: doc_type_read_version as u64
+            version: version as u64,
+            read_version: read_version as u64,
+            max_id_length: max_id_length as u64,
+            max_size_length: max_size_length as u64,
+            doc_type: doc_type,
+            doc_type_version: doc_type_version as u64,
+            doc_type_read_version: doc_type_read_version as u64,
         };
 
         info!("will serialize: {:#?}", header);
         let mut data = [0u8; 100];
         {
-          let gen_res = gen_ebml_header((&mut data[..], 0), &header);
-          info!("gen_res: {:?}", gen_res);
-          // do not fail if quickcheck generated data that is too large
-          match gen_res {
-            Err(GenError::BufferTooSmall(_)) => return true,
-            Err(_) => return false,
-            Ok(_)  => (),
-          }
+            let gen_res = gen_ebml_header((&mut data[..], 0), &header);
+            info!("gen_res: {:?}", gen_res);
+            // do not fail if quickcheck generated data that is too large
+            match gen_res {
+                Err(GenError::BufferTooSmall(_)) => return true,
+                Err(_) => return false,
+                Ok(_) => (),
+            }
         }
 
         info!("{}", (&data[..]).to_hex(16));
         let parse_res = crate::ebml::ebml_header(&data[..]);
         info!("parse_res: {:?}", parse_res);
         match parse_res {
-          Ok((_rest, h)) => {
-            assert_eq!(header, h);
-            return true;
-          },
-          e => panic!(format!("parse error: {:?}", e)),
+            Ok((_rest, h)) => {
+                assert_eq!(header, h);
+                return true;
+            }
+            e => panic!(format!("parse error: {:?}", e)),
         }
-      }
     }
 }

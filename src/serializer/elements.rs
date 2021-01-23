@@ -774,9 +774,8 @@ mod tests {
         }
     }
 
-    quickcheck! {
-      fn test_seek_head(seeks: Vec<(u64, Vec<u8>)>) -> bool {
+    #[quickcheck]
+    fn test_seek_head(seeks: Vec<(u64, Vec<u8>)>) -> bool {
         test_seek_head_serializer(seeks)
-      }
     }
 }

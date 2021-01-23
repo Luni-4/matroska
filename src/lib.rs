@@ -12,8 +12,10 @@ extern crate av_data;
 extern crate av_format;
 
 #[cfg(test)]
-#[macro_use]
 extern crate quickcheck;
+#[cfg(test)]
+#[macro_use(quickcheck)]
+extern crate quickcheck_macros;
 
 // use av_data::rational;
 
