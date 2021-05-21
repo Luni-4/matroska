@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
 
-use av_format::{buffer::AccReader, demuxer::Event, muxer};
+use av_format::{buffer::AccReader, demuxer::Event, muxer, muxer::Writer};
 
 use av_format::demuxer::Context as DemuxerCtx;
 use matroska::{demuxer::MkvDemuxer, muxer::MkvMuxer};
@@ -41,7 +41,7 @@ fn main() {
 
     let output = File::create(opt.output).unwrap();
 
-    let mut muxer = muxer::Context::new(mux, Box::new(output));
+    let mut muxer = muxer::Context::new(mux, Writer::from_nonseekable(Box::new(output)));
     muxer.configure().unwrap();
     muxer.set_global_info(demuxer.info.clone()).unwrap();
     muxer.write_header().unwrap();
