@@ -126,7 +126,7 @@ impl MkvDemuxer {
 }
 
 impl Demuxer for MkvDemuxer {
-    fn read_headers(&mut self, buf: &Box<dyn Buffered>, info: &mut GlobalInfo) -> Result<SeekFrom> {
+    fn read_headers(&mut self, buf: &mut dyn Buffered, info: &mut GlobalInfo) -> Result<SeekFrom> {
         match self.parse_until_tracks(buf.data()) {
             Ok((i, _)) => {
                 info.duration = self
@@ -156,7 +156,7 @@ impl Demuxer for MkvDemuxer {
         }
     }
 
-    fn read_event(&mut self, buf: &Box<dyn Buffered>) -> Result<(SeekFrom, Event)> {
+    fn read_event(&mut self, buf: &mut dyn Buffered) -> Result<(SeekFrom, Event)> {
         if let Some(event) = self.queue.pop_front() {
             Ok((SeekFrom::Current(0), event))
         } else {
