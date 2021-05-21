@@ -412,6 +412,7 @@ pub struct SimpleBlockFlags {
 pub enum Lacing {
     None,
     Xiph,
+    #[allow(clippy::upper_case_acronyms)]
     EBML,
     FixedSize,
 }
